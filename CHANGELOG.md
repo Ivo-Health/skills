@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+- Added Codex plugin manifests (`.agents/plugins/marketplace.json` and `plugins/ivo-health/.codex-plugin/plugin.json`) so Codex and ChatGPT can read the same skills. Superpowers is listed there as a git url pinned to the same commit as the Claude catalogue.
+
 ## 0.3.0
 
 - Added `patient-data-protection`, `nhs-writing-style` and `clinical-safety`.

@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from .codex import check_codex
 from .external import check_external
 from .pii import scan_history, scan_tree
 from .structure import check_structure
@@ -15,7 +16,7 @@ def check_skills_main(argv=None) -> int:
     parser.add_argument("--base-ref", help="git ref to compare the plugin version with, for example origin/main")
     args = parser.parse_args(argv)
     root = args.root.resolve()
-    findings = check_structure(root) + scan_tree(root) + check_external(root)
+    findings = check_structure(root) + check_codex(root) + scan_tree(root) + check_external(root)
     if args.base_ref:
         findings += check_version_bump(root, args.base_ref)
         findings += scan_history(root, args.base_ref)
