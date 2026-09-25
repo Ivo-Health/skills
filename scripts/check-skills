@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""Run all repository checks. Usage: scripts/check-skills [--base-ref origin/main]"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from ivo_skills.cli import check_skills_main  # noqa: E402
+
+sys.exit(check_skills_main())
