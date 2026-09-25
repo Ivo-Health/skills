@@ -4,12 +4,12 @@ Messages never include the matched value, so CI logs cannot leak it.
 """
 import os
 import re
+import subprocess
 from pathlib import Path
 
 from .findings import Finding
 
 ALLOWLIST_FILE = ".pii-allowlist"
-EXCLUDED_DIRS = {".git", ".superpowers", "__pycache__", "node_modules"}
 
 NHS_RE = re.compile(r"(?<![0-9A-Za-z])(\d{3})([ -]?)(\d{3})\2(\d{4})(?![0-9A-Za-z])")
 EMAIL_RE = re.compile(r"(?<![\w.+-])[\w.+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,})(?![\w-])")
@@ -81,18 +81,63 @@ def load_allowlist(root: Path) -> tuple[set[str], list[Finding]]:
     return allowed, findings
 
 
+def _files(root: Path) -> list[str]:
+    """Every file git would commit (tracked or new, not ignored), or every file outside a git repo."""
+    if (root / ".git").exists():
+        result = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+                                cwd=root, capture_output=True)
+        if result.returncode == 0:
+            paths = result.stdout.split(b"\0")
+            return sorted(set(p.decode("utf-8", "surrogateescape") for p in paths if p))
+    files = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d != ".git"]
+        files += [(Path(dirpath) / f).relative_to(root).as_posix() for f in filenames]
+    return sorted(files)
+
+
 def scan_tree(root: Path) -> list[Finding]:
     allowed, findings = load_allowlist(root)
-    for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = sorted(d for d in dirnames if d not in EXCLUDED_DIRS)
-        for filename in sorted(filenames):
-            path = Path(dirpath) / filename
-            rel = path.relative_to(root).as_posix()
-            if rel == ALLOWLIST_FILE or path.is_symlink():
-                continue
-            try:
-                text = path.read_text(encoding="utf-8")
-            except (UnicodeDecodeError, OSError):
-                continue
-            findings += scan_text(text, rel, allowed)
+    for rel in _files(root):
+        path = root / rel
+        if rel == ALLOWLIST_FILE or path.is_symlink() or not path.is_file():
+            continue
+        data = path.read_bytes()
+        if b"\0" in data:
+            if rel not in allowed:
+                findings.append(Finding(
+                    "pii", rel,
+                    "binary file cannot be scanned for patient data; remove it or allowlist its path"))
+            continue
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            text = data.decode("latin-1")  # For example a Windows-1252 CSV export.
+        findings += scan_text(text, rel, allowed)
+    return findings
+
+
+HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)")
+
+
+def scan_history(root: Path, base_ref: str) -> list[Finding]:
+    """Scan lines added by each commit since base_ref, so data added and later removed is still caught."""
+    allowed, _ = load_allowlist(root)
+    result = subprocess.run(
+        ["git", "log", "-p", "--no-color", "--unified=0", "--format=commit %H", f"{base_ref}..HEAD"],
+        cwd=root, capture_output=True)
+    if result.returncode != 0:
+        return [Finding("pii", ".", f"could not read commits since {base_ref}")]
+    findings, commit, rel, line = [], "", None, 0
+    for raw in result.stdout.decode("utf-8", "replace").splitlines():
+        if raw.startswith("commit "):
+            commit = raw[7:19]
+        elif raw.startswith("+++ "):
+            rel = raw[6:] if raw.startswith("+++ b/") else None
+        elif m := HUNK_RE.match(raw):
+            line = int(m.group(1))
+        elif raw.startswith("+") and rel and rel != ALLOWLIST_FILE:
+            for f in scan_text(raw[1:], f"{rel} (commit {commit})", allowed):
+                findings.append(Finding(f.check, f.path, f.message, line))
+            line += 1
     return findings

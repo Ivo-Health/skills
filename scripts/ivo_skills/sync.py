@@ -31,10 +31,15 @@ def fetch_skill(repo: str, commit: str, path: str, dest: Path) -> tuple[str, dic
         _run("git", "clone", "--quiet", repo, tmp)
         full = _run("git", "rev-parse", "--verify", f"{commit}^{{commit}}", cwd=tmp)
         _run("git", "checkout", "--quiet", full, cwd=tmp)
-        src = Path(tmp) / rel
+        clone = Path(tmp).resolve()
+        src = clone / rel
+        # A symlink anywhere on the path could point outside the clone, at files on this machine.
+        on_path = [clone.joinpath(*rel.parts[:i + 1]) for i in range(len(rel.parts))]
+        if any(p.is_symlink() for p in on_path) or not src.resolve().is_relative_to(clone):
+            raise SyncError(f"{path} at {full[:12]} goes through a symlink; refusing to copy it")
         if not (src / "SKILL.md").is_file():
             raise SyncError(f"{path} at {full[:12]} has no SKILL.md")
-        if src.is_symlink() or any(p.is_symlink() for p in src.rglob("*")):
+        if any(p.is_symlink() for p in src.rglob("*")):
             raise SyncError(f"{path} at {full[:12]} contains a symlink; refusing to copy it")
         if dest.exists():
             shutil.rmtree(dest)
