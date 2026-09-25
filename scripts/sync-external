@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""Copy an external skill at a reviewed commit. See docs/reviewing-external-updates.md."""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from ivo_skills.sync import sync_main  # noqa: E402
+
+sys.exit(sync_main())
