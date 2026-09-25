@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+- Added `product-design-prototyping`, for thinking through and building Ivo Health prototype changes in Lovable.
+
 ## 0.4.0
 
 - Added Codex plugin manifests (`.agents/plugins/marketplace.json` and `plugins/ivo-health/.codex-plugin/plugin.json`) so Codex and ChatGPT can read the same skills. Superpowers is listed there as a git url pinned to the same commit as the Claude catalogue.
