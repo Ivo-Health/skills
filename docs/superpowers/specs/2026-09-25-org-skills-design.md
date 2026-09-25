@@ -15,8 +15,8 @@ Give everyone at Ivo Health the same AI skills across every tool we use, from on
 
 ### Success criteria
 
-1. A new team member gets our skills in the Claude app and Claude Code without manual install steps, because they are pushed by the organisation.
-2. Codex needs one documented command. ChatGPT needs a documented upload from a release.
+1. A new team member gets our skills in the Claude app, Claude Code and ChatGPT without manual install steps, because both organisations sync from this repository.
+2. Codex needs at most one documented command, and none if the ChatGPT workspace sync also covers Codex.
 3. Adopting a new upstream version of an external skill always happens through a reviewed pull request.
 4. CI blocks a pull request that contains an NHS number, a secret or a modified copy of an external skill.
 
@@ -33,7 +33,7 @@ Give everyone at Ivo Health the same AI skills across every tool we use, from on
 | Claude Code, local | The same organisation sync, with `ivo-health` and `superpowers` set to *Required* or *Installed by default* for users signed in with their Claude account | Automatic |
 | Claude Code, cloud | As above when signed in. Fallback: a snippet in each product repo's `.claude/settings.json` (`extraKnownMarketplaces` and `enabledPlugins`) | At session start |
 | Codex | `npx skills add ivo-health/skills` (the same installer Matt Pocock's README recommends), plus Superpowers' own Codex install | Re-run the command |
-| ChatGPT | An admin uploads per-skill zips from the latest GitHub release | Manual, following the release checklist |
+| ChatGPT (and possibly Codex) | A workspace admin imports this repo as a plugin marketplace from GitHub | Daily automatic sync, or "Sync now" |
 
 Conditions for the organisation sync (from Anthropic's help centre):
 
@@ -42,7 +42,18 @@ Conditions for the organisation sync (from Anthropic's help centre):
 - The GitHub connector must be enabled for the organisation.
 - External `github` sources in `marketplace.json` must be public repositories. `obra/superpowers` is public.
 
-**To confirm during the build:** Codex skill paths and the ChatGPT skill upload process. OpenAI's documentation was not reachable from the design session, so `docs/install.md` must be checked against it before the first release.
+Conditions for the ChatGPT sync (from OpenAI's help centre and release notes):
+
+- ChatGPT Business or Enterprise workspace. The admin imports a marketplace from a public or private GitHub repository, and daily sync is on by default.
+- The import can read Claude-compatible marketplaces, so the same `.claude-plugin/marketplace.json` should serve both.
+- Importing does not grant anyone access. Admins set installation and access policy for each plugin.
+
+**To confirm during the build** (OpenAI's detailed docs were not reachable from the design session):
+1. Whether ChatGPT resolves external `github` sources, such as the Superpowers entry. If it does not, ChatGPT gets only the `ivo-health` plugin, and Superpowers is added in ChatGPT from obra's repo directly.
+2. Whether workspace plugins also reach Codex. If they do not, Codex uses `npx skills add`.
+3. Whether ChatGPT needs a Codex-format manifest in addition to the Claude one. If so, we add it alongside.
+
+**Connecting the Claude sync:** the first sync failed with "Git Repository is empty" because the repo had no commits. Once `marketplace.json` is on the default branch, re-sync from the marketplace's menu in *Organisation settings → Plugins*.
 
 ## 3. Repository layout
 
@@ -62,11 +73,9 @@ scripts/
   check-skills                       # structure, PII and hash checks
   sync-external                      # re-fetch copied skills at their pinned commit
   check-upstream                     # compare pins with upstream HEAD
-  package                            # build dist/<skill>.zip for ChatGPT
 .github/workflows/
   checks.yml                         # every PR
   upstream.yml                       # weekly
-  release.yml                        # on tag: attach zips to the GitHub release
 docs/
   install.md                         # per-platform steps
   adding-a-skill.md
@@ -161,8 +170,8 @@ The scripts are Python 3 with no third-party dependencies apart from gitleaks in
 ## 7. Releases
 
 - Versions follow semver in `plugin.json`, with an entry in `CHANGELOG.md` saying which skills changed.
-- When a `v*` tag is pushed, `release.yml` runs `scripts/package` and attaches `dist/<skill>.zip` for each skill to the GitHub release, for the ChatGPT upload.
-- `docs/install.md` includes a short checklist for the ChatGPT upload.
+- Claude syncs when a PR with a version bump is merged. ChatGPT syncs daily; use "Sync now" for an urgent change.
+- No build artefacts or zips are needed.
 
 ## 8. Security
 
@@ -176,6 +185,6 @@ The scripts are Python 3 with no third-party dependencies apart from gitleaks in
 
 ## 9. Open items
 
-1. Confirm the Claude plan (Enterprise), then connect the repo in organisation settings and set plugins to Required.
-2. Confirm the Codex install paths and the ChatGPT upload process against OpenAI's documentation.
+1. Confirm the Claude plan (Enterprise). Once `marketplace.json` is merged, re-sync in organisation settings and set plugins to Required.
+2. Connect the repo in the ChatGPT workspace, and confirm the three ChatGPT and Codex points in section 2.
 3. Decide who is the data protection lead named in `SECURITY.md`.
