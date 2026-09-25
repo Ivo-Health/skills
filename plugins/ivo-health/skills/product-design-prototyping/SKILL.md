@@ -22,8 +22,9 @@ Six stages: intake, grill, route, build, verify, improve. Never skip the grill. 
 
 ## Known projects and how they work
 
-- H@H Operations Support (WardFlow, main prototype): project `caccc683-5646-4800-9f1e-dd99dc6bfcfd`, workspace `vOROc3zCjEDWLIJFQOi4`. Preview: `https://id-preview--caccc683-5646-4800-9f1e-dd99dc6bfcfd.lovable.app` (password gated).
-- IVO Health Website: project `1faf193b-2fea-40cc-9ccf-7fb29a9054eb`, same workspace.
+- H@H Operations Support (WardFlow, main prototype). The preview is password gated.
+- IVO Health Website, in the same workspace.
+- Find each project by name through the Lovable connection, and take the preview link from `get_project`. Do not write project IDs or preview links into this skill. If more than one project matches a name, ask Laurence which to use.
 - Design system: the "Ivo Health" Design System artifact. Read its `project/README.md` before visual changes and use its token names.
 
 H@H prototype architecture:
