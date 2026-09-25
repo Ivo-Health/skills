@@ -48,10 +48,13 @@ A workspace admin sets this up once:
 3. Daily sync is on by default. Use Sync now for an urgent change.
 4. Set installation and access for each plugin. Importing does not give anyone access by itself.
 
-To confirm when first connected, and record the answers here:
+ChatGPT does not support the `github` plugin source, so it reports "Marketplace entry `superpowers` uses an unsupported plugin source" and imports only `ivo-health`. This is expected. To add Superpowers in ChatGPT:
 
-- whether ChatGPT loads Superpowers from its GitHub source
-- whether the plugins also reach Codex
+1. Import a second marketplace from GitHub, and select `obra/superpowers`.
+2. Enable only the `superpowers` plugin.
+3. Check that the version shown matches the one pinned in `.claude-plugin/marketplace.json`. ChatGPT follows the upstream repository rather than our pin, so review the Superpowers release notes before new versions reach staff.
+
+Still to confirm, and record here: whether the workspace plugins also reach Codex.
 
 ## Codex
 
