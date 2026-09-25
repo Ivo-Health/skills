@@ -1,0 +1,16 @@
+{
+  "name": "ivo-health",
+  "version": "0.4.0",
+  "description": "Ivo Health's approved AI skills.",
+  "author": {
+    "name": "Ivo Health"
+  },
+  "repository": "https://github.com/Ivo-Health/skills",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ivo Health",
+    "shortDescription": "Patient data protection, NHS writing style, clinical safety and reviewed grilling skills",
+    "developerName": "Ivo Health",
+    "category": "Developer Tools"
+  }
+}

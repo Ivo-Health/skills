@@ -48,18 +48,28 @@ A workspace admin sets this up once:
 3. Daily sync is on by default. Use Sync now for an urgent change.
 4. Set installation and access for each plugin. Importing does not give anyone access by itself.
 
-ChatGPT does not support the `github` plugin source, so it reports "Marketplace entry `superpowers` uses an unsupported plugin source" and imports only `ivo-health`. This is expected. To add Superpowers in ChatGPT:
+This repository has two catalogues that point at the same skills:
 
-1. Import a second marketplace from GitHub, and select `obra/superpowers`.
-2. Enable only the `superpowers` plugin.
-3. Check that the version shown matches the one pinned in `.claude-plugin/marketplace.json`. ChatGPT follows the upstream repository rather than our pin, so review the Superpowers release notes before new versions reach staff.
+- `.claude-plugin/marketplace.json` for Claude
+- `.agents/plugins/marketplace.json` for Codex and ChatGPT
 
-Still to confirm, and record here: whether the workspace plugins also reach Codex.
+Both list `ivo-health`, and Superpowers pinned to the same commit. The Codex catalogue gives Superpowers as a git `url` with a `sha`, rather than the `github` source that ChatGPT rejected with "Marketplace entry `superpowers` uses an unsupported plugin source".
+
+To confirm at the next sync, and record here:
+
+- which catalogue ChatGPT reads
+- whether the Superpowers error has gone
+
+If the error is still there, import a second marketplace from `obra/superpowers` and enable only `superpowers`. Note that ChatGPT then follows upstream rather than our pin.
 
 ## Codex
 
-If the ChatGPT workspace plugins do not reach Codex, run this in each project:
+Add this repository as a plugin marketplace, then install both plugins:
 
-    npx skills@latest add Ivo-Health/skills
+    codex plugin marketplace add Ivo-Health/skills
+    codex plugin add ivo-health@ivo-health
+    codex plugin add superpowers@ivo-health
 
-For Superpowers, follow the Codex instructions in the Superpowers README.
+`codex plugin list` should show `ivo-health` at the version in `plugins/ivo-health/.claude-plugin/plugin.json`, and `superpowers` at the pinned sha.
+
+Codex has no equivalent of Claude's per-repository `enabledPlugins`, so each person adds the marketplace once. To update, run `codex plugin marketplace upgrade ivo-health`.

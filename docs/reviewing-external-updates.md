@@ -14,7 +14,7 @@ Each Monday, a workflow checks whether an external skill has changed upstream. I
        scripts/sync-external <skill-name> --commit <reviewed commit> --reviewed-by "<your full name>"
 
    If a skill now calls another skill, add `--requires <other-skill>`, and copy that skill too.
-3. **For Superpowers**, change `sha` in `.claude-plugin/marketplace.json` to the reviewed commit, and update the description with the new version.
+3. **For Superpowers**, change `sha` to the reviewed commit in both `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`, and update the description with the new version. `check-skills` fails if the two pins differ.
 4. Bump the plugin version, update `CHANGELOG.md`, and open a pull request. Another team member reviews it.
 
 ## To add a new external skill

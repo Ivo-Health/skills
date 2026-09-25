@@ -1,0 +1,30 @@
+{
+  "name": "ivo-health",
+  "interface": {
+    "displayName": "Ivo Health"
+  },
+  "plugins": [
+    {
+      "name": "ivo-health",
+      "source": "./plugins/ivo-health",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "superpowers",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/obra/superpowers.git",
+        "sha": "5bf4e78011075bcfc0dc295f0724994cd123ee71"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
