@@ -1,0 +1,7 @@
+# <exact value> # <reason>
+bob@gmail.com # made-up address used in scanner tests and the implementation plan
+jane.smith@gmail.com # made-up address used in scanner tests and the implementation plan
+07123 456789 # made-up number used in scanner tests and the implementation plan
++44 (0)161 234 5678 # made-up number used in scanner tests and the implementation plan
+noreply@anthropic.com # commit trailer address quoted in the implementation plan
+x00bob@gmail.com # how the scanner reads the binary-file fixture in scanner tests and the plan

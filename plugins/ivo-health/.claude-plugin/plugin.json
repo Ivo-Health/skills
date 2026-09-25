@@ -1,0 +1,10 @@
+{
+  "name": "ivo-health",
+  "version": "0.1.0",
+  "description": "Ivo Health's approved AI skills.",
+  "author": {
+    "name": "Ivo Health"
+  },
+  "repository": "https://github.com/Ivo-Health/skills",
+  "license": "UNLICENSED"
+}

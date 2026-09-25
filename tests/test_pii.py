@@ -108,6 +108,10 @@ class ScanTreeTest(unittest.TestCase):
         (self.root / "image.png").write_bytes(b"\xff\xfe\x00bob@gmail.com")
         self.assertEqual(scan_tree(self.root), [])
 
+    def test_skips_local_superpowers_workspace(self):
+        write(self.root, ".superpowers/sdd/plan/brief.md", "bob@gmail.com")
+        self.assertEqual(scan_tree(self.root), [])
+
     def test_allowlist_file_with_reasons(self):
         write(self.root, "a.md", "owner bob@gmail.com")
         write(self.root, ".pii-allowlist", "bob@gmail.com # public maintainer address\n")

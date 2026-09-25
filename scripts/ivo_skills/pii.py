@@ -9,7 +9,7 @@ from pathlib import Path
 from .findings import Finding
 
 ALLOWLIST_FILE = ".pii-allowlist"
-EXCLUDED_DIRS = {".git", "__pycache__", "node_modules"}
+EXCLUDED_DIRS = {".git", ".superpowers", "__pycache__", "node_modules"}
 
 NHS_RE = re.compile(r"(?<![0-9A-Za-z])(\d{3})([ -]?)(\d{3})\2(\d{4})(?![0-9A-Za-z])")
 EMAIL_RE = re.compile(r"(?<![\w.+-])[\w.+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,})(?![\w-])")
