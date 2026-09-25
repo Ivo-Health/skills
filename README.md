@@ -6,7 +6,7 @@ The AI skills we use at Ivo Health, in one place. Claude, Claude Code, ChatGPT a
 
 | Plugin | What it contains | Where it comes from |
 |---|---|---|
-| `ivo-health` | `patient-data-protection`, `nhs-writing-style`, `clinical-safety`, and unmodified copies of `grill-me` and `grilling` | This repository. Copied skills are listed in `external-skills.lock.json` |
+| `ivo-health` | `patient-data-protection`, `nhs-writing-style`, `clinical-safety`, `product-design-prototyping`, and unmodified copies of `grill-me` and `grilling` | This repository. Copied skills are listed in `external-skills.lock.json` |
 | `superpowers` | Development workflow skills by Jesse Vincent | `obra/superpowers`, pinned in `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json` |
 
 ## Getting the skills
