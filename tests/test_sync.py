@@ -90,6 +90,18 @@ class SyncTest(unittest.TestCase):
             self.add()
         self.assertFalse((self.root / SKILLS_DIR / "grilling").exists())
 
+    def test_rejects_symlinked_parent_folder(self):
+        outside = Path(self._tmp.name) / "outside" / "secret"
+        write(outside.parent, "secret/SKILL.md", "---\nname: secret\n---\n")
+        write(outside.parent, "secret/key", "private\n")
+        os.symlink(str(outside.parent), self.upstream / "linked")
+        git(self.upstream, "add", "-A")
+        git(self.upstream, "commit", "-q", "-m", "link")
+        self.v1 = git(self.upstream, "rev-parse", "HEAD")
+        with self.assertRaisesRegex(SyncError, "symlink"):
+            self.add(path="linked/secret")
+        self.assertFalse((self.root / SKILLS_DIR / "grilling").exists())
+
     def test_rejects_folder_without_skill_md(self):
         with self.assertRaisesRegex(SyncError, "has no SKILL.md"):
             self.add(path="skills")

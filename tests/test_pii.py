@@ -1,8 +1,9 @@
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
-from ivo_skills.pii import nhs_number_is_valid, scan_text, scan_tree
+from ivo_skills.pii import nhs_number_is_valid, scan_history, scan_text, scan_tree
 from tests.helpers import write
 
 
@@ -103,14 +104,29 @@ class ScanTreeTest(unittest.TestCase):
         findings = scan_tree(self.root)
         self.assertEqual([(f.path, f.line) for f in findings], [("docs/a.md", 2)])
 
-    def test_skips_git_directory_and_binary_files(self):
+    def test_skips_git_directory(self):
         write(self.root, ".git/config", "bob@gmail.com")
-        (self.root / "image.png").write_bytes(b"\xff\xfe\x00bob@gmail.com")
         self.assertEqual(scan_tree(self.root), [])
 
-    def test_skips_local_superpowers_workspace(self):
-        write(self.root, ".superpowers/sdd/plan/brief.md", "bob@gmail.com")
+    def test_binary_file_is_reported_unless_allowlisted(self):
+        (self.root / "export.xlsx").write_bytes(b"PK\x03\x04\x00\x00data")
+        self.assertEqual([f.message for f in scan_tree(self.root)],
+                         ["binary file cannot be scanned for patient data; remove it or allowlist its path"])
+        write(self.root, ".pii-allowlist", "export.xlsx # test fixture\n")
         self.assertEqual(scan_tree(self.root), [])
+
+    def test_non_utf8_text_is_still_scanned(self):
+        (self.root / "export.csv").write_bytes("Jos\xe9,bob@gmail.com\n".encode("cp1252"))
+        self.assertEqual([f.path for f in scan_tree(self.root)], ["export.csv"])
+
+    def test_git_repo_scans_tracked_and_new_files_but_not_ignored_ones(self):
+        subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
+        write(self.root, ".gitignore", "local/\n")
+        write(self.root, "local/brief.md", "bob@gmail.com")
+        write(self.root, "skills/x/node_modules/notes.md", "bob@gmail.com")
+        write(self.root, "skills/x/__pycache__/notes.txt", "bob@gmail.com")
+        self.assertEqual(sorted(f.path for f in scan_tree(self.root)),
+                         ["skills/x/__pycache__/notes.txt", "skills/x/node_modules/notes.md"])
 
     def test_allowlist_file_with_reasons(self):
         write(self.root, "a.md", "owner bob@gmail.com")
@@ -121,3 +137,43 @@ class ScanTreeTest(unittest.TestCase):
         write(self.root, ".pii-allowlist", "bob@gmail.com\n")
         self.assertEqual([f.message for f in scan_tree(self.root)],
                          ["each entry needs a reason: '<value> # <reason>'"])
+
+
+class ScanHistoryTest(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        for args in (["init", "-q", "-b", "main"], ["config", "user.email", "test@example.com"],
+                     ["config", "user.name", "Test"]):
+            self.git(*args)
+        write(self.root, "a.md", "fine\n")
+        self.commit()
+        self.git("checkout", "-q", "-b", "feature")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def git(self, *args):
+        return subprocess.run(["git", *args], cwd=self.root, check=True,
+                              capture_output=True, text=True).stdout.strip()
+
+    def commit(self):
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", "change")
+        return self.git("rev-parse", "HEAD")
+
+    def test_value_added_then_removed_is_reported(self):
+        write(self.root, "a.md", "fine\ncontact bob@gmail.com\n")
+        added = self.commit()
+        write(self.root, "a.md", "fine\n")
+        self.commit()
+        self.assertEqual(scan_tree(self.root), [])
+        findings = scan_history(self.root, "main")
+        self.assertEqual([(f.path, f.line) for f in findings], [(f"a.md (commit {added[:12]})", 2)])
+        self.assertNotIn("bob@gmail.com", str(findings[0]))
+
+    def test_allowlisted_values_and_removed_lines_are_ignored(self):
+        write(self.root, ".pii-allowlist", "bob@gmail.com # fixture\n")
+        write(self.root, "b.md", "bob@gmail.com\n")
+        self.commit()
+        self.assertEqual(scan_history(self.root, "main"), [])

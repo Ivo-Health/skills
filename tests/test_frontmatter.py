@@ -36,3 +36,9 @@ class ParseFrontmatterTest(unittest.TestCase):
     def test_line_without_colon(self):
         with self.assertRaises(FrontmatterError):
             parse_frontmatter("---\njust words\n---\n")
+
+    def test_error_does_not_echo_the_line(self):
+        with self.assertRaises(FrontmatterError) as ctx:
+            parse_frontmatter("---\nname: x\nsecret words here\n---\n")
+        self.assertNotIn("secret", str(ctx.exception))
+        self.assertIn("line 3", str(ctx.exception))

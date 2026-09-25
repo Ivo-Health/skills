@@ -13,7 +13,7 @@ def parse_frontmatter(text: str) -> dict[str, str]:
         raise FrontmatterError("file must start with a '---' front matter line")
     fields: dict[str, str] = {}
     block_key = None
-    for line in lines[1:]:
+    for n, line in enumerate(lines[1:], 2):
         if line.strip() == "---":
             return fields
         if line[:1] in (" ", "\t"):
@@ -27,7 +27,8 @@ def parse_frontmatter(text: str) -> dict[str, str]:
         key, sep, value = line.partition(":")
         key, value = key.strip(), value.strip()
         if not sep or not key:
-            raise FrontmatterError(f"expected 'key: value', got {line!r}")
+            # Do not echo the line: it could contain patient data and would reach CI logs.
+            raise FrontmatterError(f"line {n}: expected 'key: value'")
         if value in BLOCK_MARKERS:
             fields[key] = ""
             block_key = key
