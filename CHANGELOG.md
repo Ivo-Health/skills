@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- Moved the Superpowers pin from v6.4.1 to v6.4.2 (`8ca22dba9a94`), in both the Claude and Codex catalogues. The upstream diff must be reviewed before this is merged.
+
 ## 0.5.0
 
 - Added `product-design-prototyping`, for thinking through and building Ivo Health prototype changes in Lovable.
