@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Improve .NET architecture
 
-A periodic health check of a C# codebase. You find 5 to 8 structural improvements ("candidates"), rank them in a
+A periodic health check of a C# codebase. You find up to 8 structural improvements ("candidates"), rank them in a
 report, help the team choose one, and shape its design. You do not change code. The design goes to
 `writing-plans` to be built.
 
@@ -77,7 +77,7 @@ values.
 ### 4. Choose the candidates
 
 - Merge friction that has one cause into one candidate. If two candidates overlap but have different causes, keep
-  them apart and say on both cards that they overlap.
+  them apart and fill the "Overlaps with" section on both cards.
 - Apply the **deletion test** from `references/deep-modules.md`.
 - Drop anything a convention or architecture decision record (ADR) rules out. Keep it only when the evidence is
   strong, and then label it "Changes a convention" or "Reopens ADR-NNN" with the reason.
@@ -86,7 +86,8 @@ values.
   not a candidate.
 - Rank by gain. Judge gain by how many places the change simplifies, how often those places change, and the risk it
   removes, such as a rule that can be missed or a lifetime bug. Break ties by change count.
-- Keep 5 to 8. If fewer than 5 have evidence, report fewer and say so. Never add a candidate just to reach 5.
+- Keep 5 to 8. If fewer than 5 have evidence, report fewer and say so in the
+  report summary. Never add a candidate just to reach 5.
 
 ### 5. Check patient safety and patient data
 
@@ -104,6 +105,8 @@ values.
 2. Fill one card per candidate. Use more than one lens chip if a candidate spans lenses. Give every card evidence
    and a before and after diagram. Cite only sources listed in `references/sources.md`, using their exact URLs.
 3. Check every `file:line` before you finish: open the file at that line and confirm it shows what the card says.
+   For seed data, fixtures and sample files, confirm with a search for the member name instead, so you do not read
+   data values.
 4. Do not design interfaces yet. Each card gives a direction, not a solution.
 5. Publish the report as a private Artifact page. Never write it into the repository. If you cannot publish, or the
    user asked you not to, write it to your scratchpad or temporary directory and send it to the user. Diagrams then

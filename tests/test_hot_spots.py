@@ -80,6 +80,11 @@ class HotSpotsTest(unittest.TestCase):
         _, pairs = self.analyse(max_files=4)
         self.assertEqual(pairs, {("A.cs", "B.cs"): 2})
 
+    def test_repo_can_be_a_subfolder(self):
+        self.commit({"src/web/A.cs": "// 1\n", "src/other/B.cs": "// 1\n"})
+        churn, _ = _load().analyse(self.repo / "src/web", since="10 years ago")
+        self.assertEqual(churn, {"src/web/A.cs": 1})
+
     def test_main_prints_both_lists(self):
         self.commit({"A.cs": "// 1\n", "B.cs": "// 1\n"})
         out = io.StringIO()

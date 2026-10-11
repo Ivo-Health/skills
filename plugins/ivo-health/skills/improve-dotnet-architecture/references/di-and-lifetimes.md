@@ -1,7 +1,7 @@
 # Lens: DI and lifetimes
 
-Service lifetimes must be safe, especially in Blazor Server, where a DI scope lasts for the whole circuit. A circuit
-is one open browser tab and can last for hours
+Service lifetimes must be safe, especially in Blazor Server, where a DI scope lasts for the whole circuit: the
+connection between one browser tab and the server. Scoped services can live much longer than a single component
 (https://learn.microsoft.com/aspnet/core/blazor/fundamentals/dependency-injection).
 
 Read the repository's conventions first. Many set their own lifetime rules, such as singletons by default. Check the
@@ -46,8 +46,9 @@ offer a method for it, so components never touch the container.
 
 ### 4. Constructor over-injection
 
-A constructor with more than 4 or 5 dependencies is a sign the class does too much
-(https://blog.ploeh.dk/2018/08/27/on-constructor-over-injection/).
+Many constructor dependencies are a code smell: a sign the class may do too much
+(https://blog.ploeh.dk/2018/08/27/on-constructor-over-injection/). Seemann gives no fixed number. As a rule of thumb
+for this review, look closely at constructors with more than 4 or 5.
 
 **Direction:**
 - Dependencies that are always used together → group them behind a **Facade Service** that names what they do

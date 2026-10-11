@@ -41,12 +41,14 @@ def _wanted(repo: Path, key: str, include_tests: bool) -> bool:
     return _exists(repo, key)
 
 
-def _commits(repo: Path, since: str):
+def _git(cwd: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True, text=True, encoding="utf-8",
+                          errors="replace").stdout
+
+
+def _commits(top: Path, since: str):
     """Yield the set of paths each commit touched, newest first, with each path mapped to its latest name."""
-    log = subprocess.run(
-        ["git", "log", "-M", "--name-status", f"--pretty=format:{COMMIT_MARK}", f"--since={since}"],
-        cwd=repo, check=True, capture_output=True, text=True, encoding="utf-8", errors="replace",
-    ).stdout
+    log = _git(top, "log", "-M", "--name-status", f"--pretty=format:{COMMIT_MARK}", f"--since={since}")
     renamed_to: dict[str, str] = {}
 
     def latest(path: str) -> str:
@@ -79,11 +81,15 @@ def _commits(repo: Path, since: str):
 
 def analyse(repo: Path, since: str = "6 months ago", max_files: int = 30, include_tests: bool = False):
     """Return (changes per file, changes per pair of files)."""
-    repo = Path(repo)
+    repo = Path(repo).resolve()
+    top = Path(_git(repo, "rev-parse", "--show-toplevel").strip())
+    # Read the whole history, so files moved into the folder keep their earlier changes, then filter to the folder.
+    sub = repo.relative_to(top).as_posix()
     churn: Counter = Counter()
     pairs: Counter = Counter()
-    for touched in _commits(repo, since):
-        keys = sorted({k for k in map(_key, touched) if _wanted(repo, k, include_tests)})
+    for touched in _commits(top, since):
+        keys = sorted({k for k in map(_key, touched)
+                       if (sub == "." or k.startswith(sub + "/")) and _wanted(top, k, include_tests)})
         churn.update(keys)
         if len(keys) <= max_files:
             pairs.update(combinations(keys, 2))
@@ -92,7 +98,7 @@ def analyse(repo: Path, since: str = "6 months ago", max_files: int = 30, includ
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--repo", default=".")
+    parser.add_argument("--repo", default=".", help="repository, or a folder in it to limit the counts to")
     parser.add_argument("--since", default="6 months ago")
     parser.add_argument("--top", type=int, default=30)
     parser.add_argument("--pairs", type=int, default=20)

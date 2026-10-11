@@ -7,6 +7,13 @@ SKILL = ROOT / "plugins/ivo-health/skills/improve-dotnet-architecture"
 URL_RE = re.compile(r"https?://[^\s)`|>\"']+")
 
 
+def _unpinned_scripts(html: str) -> list[str]:
+    """Script URLs, from src attributes or module imports, that are not pinned to an exact version."""
+    urls = re.findall(r"""<script[^>]+src\s*=\s*["']([^"']+)["']""", html)
+    urls += re.findall(r"""(?:import\s[^;]*?\sfrom\s*|import\s*\(?\s*)["'](https?://[^"']+)["']""", html)
+    return [u for u in urls if not re.search(r"@\d+\.\d+\.\d+/|/\d+\.\d+\.\d+/", u)]
+
+
 def _urls(text: str) -> set[str]:
     return {u.rstrip(".,;:") for u in URL_RE.findall(text)}
 
@@ -23,9 +30,15 @@ class ImproveDotnetArchitectureTest(unittest.TestCase):
     def test_template_scripts_pin_exact_versions(self):
         html = (SKILL / "references/report-template.html").read_text(encoding="utf-8")
         # Artifact pages render Mermaid themselves, so the template should need no scripts. Any added must be pinned.
-        scripts = re.findall(r'<script[^>]+src="([^"]+)"', html)
-        unpinned = [s for s in scripts if not re.search(r"@\d+\.\d+\.\d+/|/\d+\.\d+\.\d+/", s)]
-        self.assertEqual(unpinned, [])
+        self.assertEqual(_unpinned_scripts(html), [])
+
+    def test_pin_check_catches_unpinned_loaders(self):
+        self.assertEqual(len(_unpinned_scripts(
+            '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"'
+            "</script>")), 1)
+        self.assertEqual(len(_unpinned_scripts("<script src='https://unpkg.com/mermaid/dist/mermaid.min.js'></script>")), 1)
+        self.assertEqual(_unpinned_scripts(
+            '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.1/mermaid.min.js"></script>'), [])
 
     def test_template_has_dark_mode_tokens(self):
         html = (SKILL / "references/report-template.html").read_text(encoding="utf-8")

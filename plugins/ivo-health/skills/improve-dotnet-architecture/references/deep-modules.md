@@ -1,7 +1,8 @@
 # Lens: deep modules
 
 A deep module gives a lot of behaviour through a small interface. Callers learn little and get much. Maintainers
-find the behaviour in one place. Small, well-bounded modules also fit in the context an AI tool can hold
+find the behaviour in one place. Seemann asks whether code designed to fit in a person's head would also suit
+AI tools, which can hold only so much at once
 (https://blog.ploeh.dk/2026/02/02/code-that-fits-in-a-context-window/).
 
 ## What to look for

@@ -4,7 +4,8 @@ Each business rule should live in one place, and each entity should be able to p
 
 ## Position: rule locality, not methods
 
-Fowler calls a model "anaemic" when its objects are "little more than bags of getters and setters", with the
+Fowler describes an "Anemic Domain Model" (anaemic, in UK spelling) as one whose objects are "little more than bags
+of getters and setters", with the
 behaviour in service classes (https://martinfowler.com/bliki/AnemicDomainModel.html, as quoted in
 https://learn.microsoft.com/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-domain-model).
 

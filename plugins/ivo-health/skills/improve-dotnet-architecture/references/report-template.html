@@ -1,7 +1,8 @@
 <title>{{Repository}} architecture check</title>
 <!--
   Template for the improve-dotnet-architecture report.
-  - Replace every {{placeholder}}. Copy the candidate <article> once per candidate, 5 to 8 in all.
+  - Replace every {{placeholder}}. Copy the candidate <article> once per candidate, up to 8. If fewer than 5 have evidence, keep
+    only those and fill the "Fewer candidates" note. Never add a card to reach 5.
   - Remove the example card and this comment before publishing.
   - Names only: files, types and members. Never data values, fixture contents, seed data or log output.
   - Diagrams: write Mermaid inside <pre class="mermaid">. Artifact pages render it; no script is needed.
@@ -94,6 +95,8 @@
   <header>
     <h1>{{Repository}} architecture check</h1>
     <p>{{One or two sentences: what was reviewed and the main theme of the findings.}}</p>
+    <p>{{Fewer candidates note, only if fewer than 5: "Only N changes had enough evidence to suggest." Otherwise
+      remove this paragraph.}}</p>
     <dl class="meta">
       <dt>Commit</dt><dd><code>{{short SHA}}</code> {{on <code>branch</code>, or "detached"}}</dd>
       <dt>Date</dt><dd>{{Day Month Year, such as 3 March 2027}}</dd>
@@ -134,6 +137,11 @@
         <h3>Direction</h3>
         <p>Give <code>Visit</code> one method that applies the rule and returns a result. Callers ask the visit
           instead of checking its status.</p>
+      </div>
+      <!-- Only if this candidate overlaps another: -->
+      <div class="section">
+        <h3>Overlaps with</h3>
+        <p>Candidate {{N}}: {{what they share and whether to do them together}}</p>
       </div>
       <div class="section">
         <h3>Gains</h3>
