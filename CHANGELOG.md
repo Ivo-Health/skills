@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- Added `improve-dotnet-architecture`, a periodic architecture health check for C# codebases. It publishes a ranked report of structural improvements and helps design the one chosen. The method is adapted from Matt Pocock's `improve-codebase-architecture`, with guidance from Mark Seemann and Microsoft Learn.
+
 ## 0.5.1
 
 - Moved the Superpowers pin from v6.4.1 to v6.4.2 (`8ca22dba9a94`), in both the Claude and Codex catalogues. The upstream diff must be reviewed before this is merged.

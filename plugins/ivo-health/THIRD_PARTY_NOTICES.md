@@ -27,3 +27,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## improve-dotnet-architecture
+
+The method of `improve-dotnet-architecture` (explore, report ranked candidates, question the user, record decisions)
+is adapted from Matt Pocock's `improve-codebase-architecture` skill,
+https://github.com/mattpocock/skills/tree/main/skills/engineering/improve-codebase-architecture, read at commit
+49dd158. No text was copied from it. Its terms "deep module", "seam", "leverage" and "locality" come from that skill and
+the work it builds on: John Ousterhout, *A Philosophy of Software Design*, and Michael Feathers, *Working Effectively
+with Legacy Code*.
