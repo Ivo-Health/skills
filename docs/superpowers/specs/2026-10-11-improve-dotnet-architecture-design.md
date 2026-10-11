@@ -39,7 +39,7 @@ from the original, and `THIRD_PARTY_NOTICES.md` credits the idea.
 | `references/di-and-lifetimes.md` | Captive dependencies, Blazor circuit scope, `DbContext` per operation, service locator, over-injection, options pattern, sync over async. |
 | `references/hot-spots.md` | `git log` commands for churn and files that change together; shallow clone handling. |
 | `references/sources.md` | Every cited source with its URL and how it was checked. |
-| `references/report-template.html` | Artifact page skeleton with exact pinned library versions. |
+| `references/report-template.html` | Artifact page skeleton; any script it loads is pinned to an exact version. |
 
 ## Process
 
@@ -97,7 +97,7 @@ from the original, and `THIRD_PARTY_NOTICES.md` credits the idea.
 
 ## Report
 
-- Private Artifact page following the artifact design guidance; light and dark modes; Mermaid at an exact version.
+- Private Artifact page following the artifact design guidance; light and dark modes; Mermaid diagrams rendered by the Artifact page itself, so no script is loaded.
 - Header: repo and commit, date, scope, ADRs and conventions read.
 - Card per candidate: title; lens; strength (Strong, Worth exploring, Speculative); files with `file:line` evidence;
   problem in one sentence; proposed direction (no interface design yet); gains (leverage, locality, tests);

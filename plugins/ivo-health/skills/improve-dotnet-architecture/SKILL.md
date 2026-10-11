@@ -86,7 +86,7 @@ Record each piece of friction with `file:line` evidence and the type and member 
 
 Build the report from `references/report-template.html`. Load the `artifact-design` skill first. Publish it as a
 private Artifact page. If you cannot publish Artifacts, write the file to your scratchpad or temporary directory and
-send it to the user. Never write the report into the repository.
+send it to the user. Tell them the diagrams will show as Mermaid text there. Never write the report into the repository.
 
 Write in plain English, following `nhs-writing-style`. Do not design interfaces yet. Each card gives a direction,
 not a solution.
