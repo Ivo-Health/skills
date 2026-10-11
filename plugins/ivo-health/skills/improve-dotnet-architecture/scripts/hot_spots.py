@@ -91,7 +91,8 @@ def analyse(repo: Path, since: str = "6 months ago", max_files: int = 30, includ
         keys = sorted({k for k in map(_key, touched)
                        if (sub == "." or k.startswith(sub + "/")) and _wanted(top, k, include_tests)})
         churn.update(keys)
-        if len(keys) <= max_files:
+        # Judge commit size on everything it touched, so a repository-wide commit is skipped even in a subfolder.
+        if len(touched) <= max_files:
             pairs.update(combinations(keys, 2))
     return dict(churn), dict(pairs)
 
@@ -109,6 +110,7 @@ def main(argv=None) -> int:
 
     churn, pairs = analyse(Path(args.repo), args.since, args.max_files, args.include_tests)
     print(f"Files that change most (since {args.since})")
+    print(f"Total file changes: {sum(churn.values())}")
     for path, count in sorted(churn.items(), key=lambda kv: (-kv[1], kv[0]))[: args.top]:
         print(f"{count:>4}  {path}")
     print()

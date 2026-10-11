@@ -85,6 +85,14 @@ class HotSpotsTest(unittest.TestCase):
         churn, _ = _load().analyse(self.repo / "src/web", since="10 years ago")
         self.assertEqual(churn, {"src/web/A.cs": 1})
 
+    def test_bulk_cutoff_counts_files_outside_the_subfolder(self):
+        for n in range(2):
+            self.commit({"src/web/A.cs": f"// {n}\n", "src/web/B.cs": f"// {n}\n"})
+        self.commit({f"src/other/Bulk{n}.cs": "// x\n" for n in range(5)}
+                    | {"src/web/A.cs": "// 9\n", "src/web/B.cs": "// 9\n"})
+        _, pairs = _load().analyse(self.repo / "src/web", since="10 years ago", max_files=4)
+        self.assertEqual(pairs, {("src/web/A.cs", "src/web/B.cs"): 2})
+
     def test_main_prints_both_lists(self):
         self.commit({"A.cs": "// 1\n", "B.cs": "// 1\n"})
         out = io.StringIO()
@@ -92,6 +100,7 @@ class HotSpotsTest(unittest.TestCase):
             _load().main(["--repo", str(self.repo), "--since", "10 years ago"])
         text = out.getvalue()
         self.assertIn("Files that change most", text)
+        self.assertIn("Total file changes: 2", text)
         self.assertIn("1  A.cs", text)
         self.assertIn("Files that change together", text)
         self.assertIn("1  A.cs  B.cs", text)

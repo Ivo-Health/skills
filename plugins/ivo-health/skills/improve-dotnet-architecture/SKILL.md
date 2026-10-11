@@ -42,11 +42,15 @@ Load `patient-data-protection` and `nhs-writing-style` now. They apply to everyt
 Read every `AGENTS.md` and `CLAUDE.md` in the repository, and every record in `docs/adr/`. These are the
 **conventions**. Take them as given.
 
+- A file applies to its own folder and everything below it. Apply its rules only to code in that folder.
+- Where two files disagree, the one nearer the code wins.
+
 - If there is no `docs/adr/`, say so in the report header and carry on.
 - If there is no `AGENTS.md` or `CLAUDE.md`, say so. Do not invent conventions. Infer the existing patterns from the
   code and label them as inferred.
 - Review one .NET solution (`.sln` or `.slnx`) per run. If the user named an area, use the solution it is in.
-  Otherwise use the solution with the most changes from step 2. List the other solutions, and any non-.NET folders,
+  Otherwise run the hot spots script once for each solution's folder (`--repo <folder>`) and use the solution with the
+  highest "Total file changes". List the other solutions, and any non-.NET folders,
   as out of scope in the report header.
 
 ### 2. Find where to look
@@ -72,7 +76,8 @@ most and the files that change together. Say in the report which you used.
 
 **Reading safely.** In seed data, test fixtures, test data builders and sample files, read only type and member
 names and signatures. Search for the names you need rather than opening the whole file, so you do not read data
-values.
+values. Use a search that prints only the match or the file name, never the whole line: for example
+`git grep -n -o -w 'MemberName' -- <file>` or `rg -n -o -w 'MemberName' <file>`.
 
 ### 4. Choose the candidates
 
@@ -105,8 +110,8 @@ values.
 2. Fill one card per candidate. Use more than one lens chip if a candidate spans lenses. Give every card evidence
    and a before and after diagram. Cite only sources listed in `references/sources.md`, using their exact URLs.
 3. Check every `file:line` before you finish: open the file at that line and confirm it shows what the card says.
-   For seed data, fixtures and sample files, confirm with a search for the member name instead, so you do not read
-   data values.
+   For seed data, fixtures and sample files, confirm with the match-only search from step 3 instead, so you do not
+   read data values.
 4. Do not design interfaces yet. Each card gives a direction, not a solution.
 5. Publish the report as a private Artifact page. Never write it into the repository. If you cannot publish, or the
    user asked you not to, write it to your scratchpad or temporary directory and send it to the user. Diagrams then
