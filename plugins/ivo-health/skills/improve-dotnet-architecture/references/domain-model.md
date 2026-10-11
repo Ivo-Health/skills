@@ -55,9 +55,13 @@ Suggest one only for a single aggregate that:
 - needs a fake so its logic can be tested quickly, or
 - really has two data sources
 
+For a repository that already exists, apply the deletion test. Also check it against the repository's conventions:
+one that takes a scoped `DbContext` where the conventions forbid it, or that has no callers, is a candidate.
+
 ## Clinical logic
 
-Rules about observations, escalation, scheduling, allocation or medication are clinical logic. Moving them can change
+Rules about patient details (names, dates of birth, addresses, contact details), observations, escalation,
+scheduling, allocation or medication are clinical logic. Moving them can change
 what staff see or when they are warned. Label the candidate "Clinical logic: needs clinical-safety".
 
 ## When not to suggest it

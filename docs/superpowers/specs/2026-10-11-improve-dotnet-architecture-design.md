@@ -37,7 +37,8 @@ from the original, and `THIRD_PARTY_NOTICES.md` credits the idea.
 | `references/testability.md` | Impureim sandwich, test doubles position, dependency categories. |
 | `references/domain-model.md` | Rule locality, feature envy, primitive obsession, invariants. |
 | `references/di-and-lifetimes.md` | Captive dependencies, Blazor circuit scope, `DbContext` per operation, service locator, over-injection, options pattern, sync over async. |
-| `references/hot-spots.md` | `git log` commands for churn and files that change together; shallow clone handling. |
+| `references/hot-spots.md` | How to find churn and files that change together; shallow clone handling. |
+| `scripts/hot_spots.py` | Rename-aware churn and co-change counts, leaving out tests and generated code. Added after the trial run. |
 | `references/sources.md` | Every cited source with its URL and how it was checked. |
 | `references/report-template.html` | Artifact page skeleton; any script it loads is pinned to an exact version. |
 

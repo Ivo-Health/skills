@@ -2,56 +2,48 @@
 
 Code that changes often is where structural problems cost the most. Rank candidates higher when they sit in it.
 
-## 1. Check the history is deep enough
+## 1. Make sure there is enough history
 
 ```bash
 git rev-parse --is-shallow-repository
 git rev-list --count HEAD
+git log --reverse --format=%cs | head -1
 ```
 
-If the clone is shallow, fetch more history before ranking:
+If the clone is shallow, fetch more history once, then count again:
 
 ```bash
 git fetch --deepen=1000 origin
 ```
 
-If you cannot fetch, or there are fewer than 200 commits, rank anyway and say in the report header that the ranking
-is based on limited history.
+In the report's History field, say:
+- how many commits were read
+- whether the clone was shallow and was deepened
+- if fewer than 200 commits could be read, that the ranking is based on limited history
+- if the 6-month window starts before the first commit, that it covers the repository's whole history
 
-## 2. Files that change most
+## 2. Run the script
 
-Last 6 months, C# and Razor files only, top 30:
-
-```bash
-git log --since="6 months ago" --name-only --pretty=format: -- '*.cs' '*.razor' \
-  | grep -v '^$' | grep -v '/Migrations/' | sort | uniq -c | sort -rn | head -30
-```
-
-Leave out generated code, migrations and snapshot files. Check the repository's conventions for other generated
-folders.
-
-## 3. Files that change together
-
-Pairs of files that often appear in the same commit show hidden coupling. Two files in different modules that always
-change together suggest the module boundary is in the wrong place.
+From the repository root:
 
 ```bash
-git log --since="6 months ago" --name-only --pretty=format:'--' -- '*.cs' '*.razor' \
-  | grep -v '/Migrations/' \
-  | awk 'function flush(  i, j, a, b) {
-           if (n <= 30) for (i = 1; i <= n; i++) for (j = i + 1; j <= n; j++) {
-             a = f[i]; b = f[j]; if (a > b) { a = f[j]; b = f[i] }; c[a " " b]++ }
-           n = 0 }
-         /^--$/ { flush(); next }
-         NF { f[++n] = $0 }
-         END { flush(); for (k in c) if (c[k] >= 4) print c[k], k }' \
-  | sort -rn | head -20
+python3 <skill folder>/scripts/hot_spots.py --since "6 months ago"
 ```
 
-The command skips commits that touch more than 30 files. They are usually renames or formatting and add noise.
+It prints the 30 files that changed most and the 20 pairs that changed together most often. It:
+- follows renames, so a file moved between folders keeps its history
+- counts `X.razor` and its code-behind `X.razor.cs` as one file
+- leaves out tests, migrations, generated code and files that no longer exist
+- skips commits of more than 30 files when counting pairs, because these are usually renames or formatting
 
-## 4. Use the results
+Options: `--include-tests`, `--top`, `--pairs`, `--max-files`, `--repo`.
 
-- Start exploring from the top 10 to 15 files by change count, and the modules they belong to.
-- Note co-change pairs that cross modules. They are evidence for deep-module and domain-model candidates.
-- Do not treat churn as a problem on its own. Tests and actively developed features change often for good reasons.
+If `python3` is not available, use `git log -M --name-only` and count by hand. Say in the report that you did.
+
+## 3. Use the results
+
+- Start from the top 10 to 15 files and the modules they belong to.
+- Pairs that cross modules show hidden coupling. Two files in different modules that change together suggest the
+  module boundary is in the wrong place. Use them as evidence for deep-module and domain-model candidates.
+- Churn is not a problem on its own. Features under active work change often for good reasons.
+- Friction found outside the hot spots still counts. Record it with its evidence, and rank it lower.

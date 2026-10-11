@@ -36,7 +36,17 @@ even when the behaviour is still right.
 ### Logic tested only against mocks
 
 A query or rule whose only tests use a mocked data source. The mock returns what the test told it to, so the test
-passes even if the real query is wrong.
+passes even if the real query is wrong. To find mocks, search the test projects for `Moq`, `NSubstitute` and
+`FakeItEasy`, and for hand-written stub classes.
+
+### Logic tested only end to end
+
+The opposite gap. A rule with many cases, such as a policy with several options or a time window with edges, whose
+only tests start the web host. Each case is slow to test, so most go untested. Check which cases the tests actually
+cover. A case used in production with no test is strong evidence.
+
+**Direction:** the same as for mixed decisions. Pull the decision into a pure function inside the module and test
+each case with plain values. Keep one end-to-end test for the wiring.
 
 ## Position on test doubles (provisional)
 

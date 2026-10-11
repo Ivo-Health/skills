@@ -15,9 +15,11 @@ A longer-lived service holds a shorter-lived one, such as a singleton taking a s
 (https://blog.ploeh.dk/2014/06/02/captive-dependency/). Common captives: `DbContext`, `UserManager<T>`,
 `SignInManager<T>`, `IOptionsSnapshot<T>` and any service the repository registers as scoped.
 
-**How to check:** list the singleton registrations, then read each constructor. Check whether the host turns on
-scope validation (`ValidateScopes`) in development; Microsoft suggests it to catch this at start-up
-(https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines).
+**How to check:** list the singleton registrations, then read each constructor. Then check once whether scope
+validation is on where tests run. Microsoft suggests `ValidateScopes` to catch captives at start-up
+(https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines). The default host builders turn
+it on only in the Development environment. If the test server runs in another environment and does not turn it on,
+note that as evidence. Do not go further than this one check.
 
 **Direction:** change the lifetime, or depend on a factory that creates the short-lived service per operation.
 
@@ -69,4 +71,6 @@ cause deadlocks. Also `await Task.Run(...)` around code that is already running 
 ## When not to suggest it
 
 - The composition root itself, test set-up code and framework start-up hooks may use `IServiceProvider` directly.
+- A singleton that creates a scope for each unit of work, such as each background job, is following the guidance
+  above, not breaking it. Flag it only if it holds on to the scope or the services from it.
 - A static page rendered per request may legitimately use scoped services, if the repository's conventions allow it.

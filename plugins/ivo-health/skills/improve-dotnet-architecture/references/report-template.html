@@ -5,6 +5,9 @@
   - Remove the example card and this comment before publishing.
   - Names only: files, types and members. Never data values, fixture contents, seed data or log output.
   - Diagrams: write Mermaid inside <pre class="mermaid">. Artifact pages render it; no script is needed.
+  - Evidence: full repository-relative paths, such as src/web/Project/Folder/File.cs:42. Check each line before publishing.
+  - Sources: only URLs listed in references/sources.md.
+  - Lens chips: one per lens the candidate spans.
   - Strength classes: strength-strong, strength-explore, strength-speculative.
   - Flag classes: flag-convention, flag-adr, flag-clinical. Leave out flags that do not apply.
 -->
@@ -92,10 +95,12 @@
     <h1>{{Repository}} architecture check</h1>
     <p>{{One or two sentences: what was reviewed and the main theme of the findings.}}</p>
     <dl class="meta">
-      <dt>Commit</dt><dd><code>{{short SHA}}</code> on <code>{{branch}}</code></dd>
-      <dt>Date</dt><dd>{{11 October 2026}}</dd>
+      <dt>Commit</dt><dd><code>{{short SHA}}</code> {{on <code>branch</code>, or "detached"}}</dd>
+      <dt>Date</dt><dd>{{Day Month Year, such as 3 March 2027}}</dd>
       <dt>Scope</dt><dd>{{Area the user named, or "Hot spots from the last 6 months of history"}}</dd>
-      <dt>History</dt><dd>{{Number of commits read. Say if the clone was shallow and the ranking is limited.}}</dd>
+      <dt>History</dt><dd>{{Commits read and how hot spots were counted. Say if the clone was shallow, the ranking is
+        limited, or the window covers the whole history.}}</dd>
+      <dt>Out of scope</dt><dd>{{Other solutions and non-.NET folders not reviewed}}</dd>
       <dt>Rules read</dt><dd>{{AGENTS.md and CLAUDE.md files read; ADRs read, or "No docs/adr folder"}}</dd>
     </dl>
   </header>
@@ -120,9 +125,9 @@
       <div class="section">
         <h3>Evidence</h3>
         <ul>
-          <li><code>Services/VisitService.cs:84</code> <code>VisitService.ReassignAsync</code></li>
-          <li><code>Components/Pages/Rota.razor.cs:132</code> <code>Rota.OnReassign</code></li>
-          <li><code>Controllers/VisitsController.cs:57</code> <code>VisitsController.Reassign</code></li>
+          <li><code>src/App/Services/VisitService.cs:84</code> <code>VisitService.ReassignAsync</code></li>
+          <li><code>src/App/Components/Pages/Rota.razor.cs:132</code> <code>Rota.OnReassign</code></li>
+          <li><code>src/App/Controllers/VisitsController.cs:57</code> <code>VisitsController.Reassign</code></li>
         </ul>
       </div>
       <div class="section">

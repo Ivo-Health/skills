@@ -35,7 +35,9 @@ Use these words with these meanings, in your notes and the report.
 
 ## Process
 
-### 1. Read the local rules
+### 1. Read the local rules and set the scope
+
+Load `patient-data-protection` and `nhs-writing-style` now. They apply to everything below.
 
 Read every `AGENTS.md` and `CLAUDE.md` in the repository, and every record in `docs/adr/`. These are the
 **conventions**. Take them as given.
@@ -43,6 +45,9 @@ Read every `AGENTS.md` and `CLAUDE.md` in the repository, and every record in `d
 - If there is no `docs/adr/`, say so in the report header and carry on.
 - If there is no `AGENTS.md` or `CLAUDE.md`, say so. Do not invent conventions. Infer the existing patterns from the
   code and label them as inferred.
+- Review one .NET solution (`.sln` or `.slnx`) per run. If the user named an area, use the solution it is in.
+  Otherwise use the solution with the most changes from step 2. List the other solutions, and any non-.NET folders,
+  as out of scope in the report header.
 
 ### 2. Find where to look
 
@@ -51,9 +56,6 @@ most and the files that change together. Say in the report which you used.
 
 ### 3. Explore through each lens
 
-Walk the hot spots once per lens. If you can start sub-agents, give each lens to its own read-only sub-agent with its
-reference file. Load only the reference for the lens being run.
-
 | Lens | Reference | Asks |
 |---|---|---|
 | Deep modules | `references/deep-modules.md` | Are modules deep? Does each seam earn its place? |
@@ -61,37 +63,52 @@ reference file. Load only the reference for the lens being run.
 | Domain model | `references/domain-model.md` | Does each rule live in one place? Can entities protect their invariants? |
 | DI and lifetimes | `references/di-and-lifetimes.md` | Are service lifetimes safe, especially under Blazor Server circuits? |
 
-Record each piece of friction with `file:line` evidence and the type and member names involved.
+- If you can start sub-agents, give each lens to its own read-only sub-agent, with its reference file and the hot
+  spot list. Pass on the patient data rules below.
+- If you cannot, load all four references, then read each hot spot once and apply every lens as you read.
+- Stop exploring a lens when 5 more files in a row turn up nothing new. Expect to read 20 to 30 files in all.
+- Record each piece of friction with its full repository-relative path, `file:line`, and the type and member names
+  involved. Friction outside the hot spots counts too.
+
+**Reading safely.** In seed data, test fixtures, test data builders and sample files, read only type and member
+names and signatures. Search for the names you need rather than opening the whole file, so you do not read data
+values.
 
 ### 4. Choose the candidates
 
-- Merge friction that has one cause into one candidate.
+- Merge friction that has one cause into one candidate. If two candidates overlap but have different causes, keep
+  them apart and say on both cards that they overlap.
 - Apply the **deletion test** from `references/deep-modules.md`.
 - Drop anything a convention or architecture decision record (ADR) rules out. Keep it only when the evidence is
   strong, and then label it "Changes a convention" or "Reopens ADR-NNN" with the reason.
 - Give each a strength: **Strong** (clear evidence, clear gain), **Worth exploring** (real friction, the fix needs
-  discussion) or **Speculative** (a hunch worth a look).
-- Rank by gain, then by how often the code changes.
-- Keep 5 to 8. If fewer than 5 are credible, report fewer and say so. Never pad the list.
+  discussion) or **Speculative** (real evidence, but the gain is uncertain). A hunch with no `file:line` evidence is
+  not a candidate.
+- Rank by gain. Judge gain by how many places the change simplifies, how often those places change, and the risk it
+  removes, such as a rule that can be missed or a lifetime bug. Break ties by change count.
+- Keep 5 to 8. If fewer than 5 have evidence, report fewer and say so. Never add a candidate just to reach 5.
 
 ### 5. Check patient safety and patient data
 
-- Flag any candidate that touches clinical logic: what staff see about a patient, observations, alerts, escalation,
-  visit scheduling, task allocation or medication. Label it "Clinical logic: needs clinical-safety". Load the
-  `clinical-safety` skill before designing it.
+- Flag any candidate that touches clinical logic or patient details: what staff see about a patient (including
+  names, dates of birth, addresses and contact details), observations, alerts, escalation, visit scheduling, task
+  allocation or medication. Label it "Clinical logic: needs clinical-safety". Load the `clinical-safety` skill
+  before designing it.
 - The report names files, types and members only. Never copy data values, test fixture contents, seed data, log
-  output or free text into it, even when they look synthetic. Follow `patient-data-protection`.
+  output or free text into it, even when they look synthetic.
 
-### 6. Publish the report
+### 6. Write and publish the report
 
-Build the report from `references/report-template.html`. Load the `artifact-design` skill first. Publish it as a
-private Artifact page. If you cannot publish Artifacts, write the file to your scratchpad or temporary directory and
-send it to the user. Tell them the diagrams will show as Mermaid text there. Never write the report into the repository.
-
-Write in plain English, following `nhs-writing-style`. Do not design interfaces yet. Each card gives a direction,
-not a solution.
-
-Then ask: "Which of these would you like to explore?"
+1. Copy `references/report-template.html`. It already sets the design, so load `artifact-design` only for the page
+   rules. Keep the `<title>` as the first line of the file.
+2. Fill one card per candidate. Use more than one lens chip if a candidate spans lenses. Give every card evidence
+   and a before and after diagram. Cite only sources listed in `references/sources.md`, using their exact URLs.
+3. Check every `file:line` before you finish: open the file at that line and confirm it shows what the card says.
+4. Do not design interfaces yet. Each card gives a direction, not a solution.
+5. Publish the report as a private Artifact page. Never write it into the repository. If you cannot publish, or the
+   user asked you not to, write it to your scratchpad or temporary directory and send it to the user. Diagrams then
+   show as Mermaid text, which is still readable.
+6. The report ends by asking which candidate to explore. Ask the same in your reply, with one line per candidate.
 
 ### 7. Shape the chosen candidate
 

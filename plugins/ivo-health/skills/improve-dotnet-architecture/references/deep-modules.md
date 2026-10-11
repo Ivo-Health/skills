@@ -28,12 +28,17 @@ Imagine deleting the module and moving its code into its callers.
 ## Seams
 
 One adapter behind a seam is a hypothetical seam. Two adapters, such as the real one and a fake used by tests, make
-it a real seam.
+it a real seam. A test double swapped in through the container in test set-up (for example `services.Replace(...)`)
+counts as a second adapter.
 
 - Keep an interface that is a real seam, or a port to a system outside your control, such as a clinical system's
   API.
 - Suggest removing an interface with one implementation that fails the deletion test. Callers then use the class
   directly, and a reader has one fewer hop.
+- If there are several such interfaces, report them as one candidate, ranked low, unless one sits in a hot spot.
+
+To find implementations, search for `: IName` and `, IName` in the solution, and for the interface name in test
+set-up code.
 
 ## Sketch (synthetic)
 
