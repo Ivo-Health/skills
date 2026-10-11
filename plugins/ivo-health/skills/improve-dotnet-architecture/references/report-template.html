@@ -1,0 +1,193 @@
+<title>{{Repository}} architecture check</title>
+<!--
+  Template for the improve-dotnet-architecture report.
+  - Replace every {{placeholder}}. Copy the candidate <article> once per candidate, up to 8. If fewer than 5 have evidence, keep
+    only those and fill the "Fewer candidates" note. Never add a card to reach 5.
+  - Remove the example card and this comment before publishing.
+  - Names only: files, types and members. Never data values, fixture contents, seed data or log output.
+  - Diagrams: write Mermaid inside <pre class="mermaid">. Artifact pages render it; no script is needed.
+  - Evidence: full repository-relative paths, such as src/web/Project/Folder/File.cs:42. Check each line before publishing.
+  - Sources: only URLs listed in references/sources.md.
+  - Lens chips: one per lens the candidate spans.
+  - Strength classes: strength-strong, strength-explore, strength-speculative.
+  - Flag classes: flag-convention, flag-adr, flag-clinical. Leave out flags that do not apply.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one reading column; a summary header, then candidate cards in rank order, then the footer. */
+  :root {
+    --bg: #f6f8f8;
+    --surface: #ffffff;
+    --fg: #1d2729;
+    --muted: #55666a;
+    --line: #d5dfe0;
+    --accent: #1f6f78;
+    --strong: #1d6b3a;
+    --explore: #8a5a00;
+    --speculative: #5b5f8f;
+    --clinical: #a3262a;
+    --code-bg: #eef3f3;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121a1b; --surface: #1a2426; --fg: #e3ecec; --muted: #9fb1b4; --line: #2e3d40;
+      --accent: #6cc3cc; --strong: #6fcf8f; --explore: #e4b459; --speculative: #a9adec; --clinical: #f08b8e;
+      --code-bg: #213033; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121a1b; --surface: #1a2426; --fg: #e3ecec; --muted: #9fb1b4; --line: #2e3d40;
+    --accent: #6cc3cc; --strong: #6fcf8f; --explore: #e4b459; --speculative: #a9adec; --clinical: #f08b8e;
+    --code-bg: #213033; color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--font-body); }
+  .page { max-width: 52rem; margin: 0 auto; padding-inline: 16px; padding-block: 32px 48px;
+          display: grid; gap: 28px; }
+  h1, h2, h3 { line-height: 1.25; text-wrap: balance; margin: 0; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.2rem; }
+  h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  p, ul { margin: 0; }
+  ul { padding-left: 1.2rem; }
+  a { color: var(--accent); }
+  code { font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg); padding: 0.05em 0.3em;
+         border-radius: 3px; overflow-wrap: anywhere; }
+
+  header { display: grid; gap: 12px; }
+  .meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; color: var(--muted);
+          font-size: 0.92rem; }
+  .meta dt { font-weight: 600; }
+  .meta dd { margin: 0; min-width: 0; }
+
+  .candidates { display: grid; gap: 20px; counter-reset: rank; }
+  .candidate { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px;
+               display: grid; gap: 14px; min-width: 0; counter-increment: rank; }
+  .candidate > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+  .candidate > header h2::before { content: counter(rank) ". "; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+          border: 1px solid currentColor; white-space: nowrap; }
+  .lens { color: var(--accent); }
+  .strength-strong { color: var(--strong); }
+  .strength-explore { color: var(--explore); }
+  .strength-speculative { color: var(--speculative); }
+  .flag-convention, .flag-adr { color: var(--explore); }
+  .flag-clinical { color: var(--clinical); }
+  .section { display: grid; gap: 4px; min-width: 0; }
+  .diagrams { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 12px; }
+  .diagram { min-width: 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; padding: 8px;
+             background: var(--bg); }
+  .diagram pre { margin: 0; }
+  .sources { font-size: 0.9rem; color: var(--muted); }
+
+  footer { display: grid; gap: 16px; border-top: 1px solid var(--line); padding-top: 20px; }
+  .rejected li { color: var(--muted); }
+  .question { font-weight: 600; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+  <header>
+    <h1>{{Repository}} architecture check</h1>
+    <p>{{One or two sentences: what was reviewed and the main theme of the findings.}}</p>
+    <p>{{Fewer candidates note, only if fewer than 5: "Only N changes had enough evidence to suggest." Otherwise
+      remove this paragraph.}}</p>
+    <dl class="meta">
+      <dt>Commit</dt><dd><code>{{short SHA}}</code> {{on <code>branch</code>, or "detached"}}</dd>
+      <dt>Date</dt><dd>{{Day Month Year, such as 3 March 2027}}</dd>
+      <dt>Scope</dt><dd>{{Area the user named, or "Hot spots from the last 6 months of history"}}</dd>
+      <dt>History</dt><dd>{{Commits read and how hot spots were counted. Say if the clone was shallow, the ranking is
+        limited, or the window covers the whole history.}}</dd>
+      <dt>Out of scope</dt><dd>{{Other solutions and non-.NET folders not reviewed}}</dd>
+      <dt>Rules read</dt><dd>{{AGENTS.md and CLAUDE.md files read; ADRs read, or "No docs/adr folder"}}</dd>
+    </dl>
+  </header>
+
+  <section class="candidates" aria-label="Candidates in rank order">
+
+    <!-- EXAMPLE CARD: synthetic, remove before publishing -->
+    <article class="candidate">
+      <header>
+        <h2>Move visit reassignment rules onto the visit</h2>
+        <div class="chips">
+          <span class="chip lens">Domain model</span>
+          <span class="chip strength-strong">Strong</span>
+          <span class="chip flag-clinical">Clinical logic: needs clinical-safety</span>
+        </div>
+      </header>
+      <div class="section">
+        <h3>Problem</h3>
+        <p>The rule that a completed visit cannot be reassigned is checked in three places, and one of them is
+          missing a status.</p>
+      </div>
+      <div class="section">
+        <h3>Evidence</h3>
+        <ul>
+          <li><code>src/App/Services/VisitService.cs:84</code> <code>VisitService.ReassignAsync</code></li>
+          <li><code>src/App/Components/Pages/Rota.razor.cs:132</code> <code>Rota.OnReassign</code></li>
+          <li><code>src/App/Controllers/VisitsController.cs:57</code> <code>VisitsController.Reassign</code></li>
+        </ul>
+      </div>
+      <div class="section">
+        <h3>Direction</h3>
+        <p>Give <code>Visit</code> one method that applies the rule and returns a result. Callers ask the visit
+          instead of checking its status.</p>
+      </div>
+      <!-- Only if this candidate overlaps another: -->
+      <div class="section">
+        <h3>Overlaps with</h3>
+        <p>Candidate {{N}}: {{what they share and whether to do them together}}</p>
+      </div>
+      <div class="section">
+        <h3>Gains</h3>
+        <ul>
+          <li>Callers: one call, no status checks to copy.</li>
+          <li>Maintainers: the rule changes in one place.</li>
+          <li>Tests: the rule is tested on <code>Visit</code> with plain values.</li>
+        </ul>
+      </div>
+      <div class="diagrams">
+        <figure class="diagram" aria-label="Before">
+          <pre class="mermaid">
+flowchart LR
+  A[VisitService] -->|checks status| V[Visit]
+  B[Rota page] -->|checks status| V
+  C[VisitsController] -->|checks status| V
+          </pre>
+        </figure>
+        <figure class="diagram" aria-label="After">
+          <pre class="mermaid">
+flowchart LR
+  A[VisitService] -->|Reassign| V[Visit: applies rule]
+  B[Rota page] --> A
+  C[VisitsController] --> A
+          </pre>
+        </figure>
+      </div>
+      <p class="sources">Sources:
+        <a href="https://learn.microsoft.com/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-domain-model">Designing a microservice domain model (Microsoft Learn)</a>
+      </p>
+    </article>
+    <!-- END EXAMPLE CARD -->
+
+  </section>
+
+  <footer>
+    <div class="section">
+      <h2>Top recommendation</h2>
+      <p>{{Which candidate to do first, and why, in two or three sentences.}}</p>
+    </div>
+    <div class="section rejected">
+      <h3>Looked at and left out</h3>
+      <ul>
+        <li>{{Thing considered}}: {{one line on why it was left out, such as "ruled out by ADR-0003"}}</li>
+      </ul>
+    </div>
+    <p class="question">Which of these would you like to explore?</p>
+  </footer>
+</div>

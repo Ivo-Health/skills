@@ -1,0 +1,5 @@
+interface:
+  display_name: "Improve .NET architecture"
+  short_description: "Architecture health check for C# codebases"
+policy:
+  allow_implicit_invocation: false
