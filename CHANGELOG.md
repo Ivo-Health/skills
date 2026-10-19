@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+- Moved the Superpowers pin from v6.4.2 to v7.0.0 (`bb92a7774141`), in both the Claude and Codex catalogues. This release rebuilds `brainstorming`, hardens the session-start hook and fixes smaller bugs. The upstream diff must be reviewed by a team member before this is merged.
+- Updated the copy of `grilling` to `49dd158d1076`. The only change is one line asking that each question is worded so "yes" accepts the recommended answer. `grill-me` is unchanged upstream.
+
 ## 0.6.0
 
 - Added `improve-dotnet-architecture`, a periodic architecture health check for C# codebases. It publishes a ranked report of structural improvements and helps design the one chosen. The method is adapted from Matt Pocock's `improve-codebase-architecture`, with guidance from Mark Seemann and Microsoft Learn.

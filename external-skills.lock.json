@@ -16,15 +16,15 @@
       }
     },
     "grilling": {
-      "commit": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "commit": "49dd158d1076134a641b33efb035946536778336",
       "licence": "MIT",
       "path": "skills/productivity/grilling",
       "repo": "https://github.com/mattpocock/skills",
       "requires": [],
-      "reviewed_by": "Laurence Bargery",
-      "reviewed_on": "2026-09-25",
+      "reviewed_by": "Claude (automated review; human review required before merge)",
+      "reviewed_on": "2026-10-19",
       "sha256": {
-        "SKILL.md": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2",
+        "SKILL.md": "befdff1e27a1dfe2a294d5871169ac1afe16d983911daa4f32627514a48c1e15",
         "agents/openai.yaml": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
       }
     }
