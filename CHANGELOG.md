@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+- Moved the Superpowers pin from v7.0.0 to v7.0.1 (`2ce8aa15d05b`), in both the Claude and Codex catalogues. This release changes how `brainstorming` opens (it reads project context before asking questions), moves detail from `subagent-driven-development` and `writing-skills` into `references/` files, shortens `executing-plans`, and updates upstream contribution templates. Hooks and scripts are unchanged. Closes the "Upstream skill updates available" issue (#11).
+
 ## 0.6.1
 
 - Moved the Superpowers pin from v6.4.2 to v7.0.0 (`bb92a7774141`), in both the Claude and Codex catalogues. This release rebuilds `brainstorming`, hardens the session-start hook and fixes smaller bugs. The upstream diff must be reviewed by a team member before this is merged.
