@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3
+
+- Moved the Superpowers pin from v7.0.1 to v7.0.2 (`22f0b463e7a5`), in both the Claude and Codex catalogues. This release changes `brainstorming` so it asks fewer questions, asks why first and offers options with a recommendation. It removes child processes from the session-start hook, adds a PowerShell form of the hook command, makes the subagent-driven-development and executing-plans helper scripts stop when run outside a git repository, and moves test scenarios out of `systematic-debugging`. No new network calls or data sharing were found in the diff. The upstream diff must be reviewed by a team member before this is merged.
+- Updated the copy of `grilling` to `4ae2317ddb22`. The only change is one line asking that sub-agents used to find facts start with a fresh context window. `grill-me` is unchanged upstream.
+- Closes the "Upstream skill updates available" issue (#13).
+
 ## 0.6.2
 
 - Moved the Superpowers pin from v7.0.0 to v7.0.1 (`2ce8aa15d05b`), in both the Claude and Codex catalogues. This release changes how `brainstorming` opens (it reads project context before asking questions), moves detail from `subagent-driven-development` and `writing-skills` into `references/` files, shortens `executing-plans`, and updates upstream contribution templates. Hooks and scripts are unchanged. Closes the "Upstream skill updates available" issue (#11).
